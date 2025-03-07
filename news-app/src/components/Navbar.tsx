@@ -1,8 +1,8 @@
 function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <a className="navbar-brand mx-5" href="/">
-        News App
+        News Monk
       </a>
       <button
         className="navbar-toggler"
