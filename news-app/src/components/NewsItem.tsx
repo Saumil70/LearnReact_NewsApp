@@ -1,4 +1,11 @@
-function NewsItem(props: any) {
+interface Article {
+  title: string;
+  description: string | null;
+  urlToImage: string | null;
+  newsUrl: string;
+}
+
+function NewsItem(props: Article) {
   let { title, description, urlToImage, newsUrl } = props;
   return (
     <div className="card" style={{ width: "18rem", height: "415px" }}>

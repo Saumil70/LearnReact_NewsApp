@@ -54,7 +54,7 @@ function News() {
   };
 
   const handleNextClick = () => {
-    if (currentPage <= Math.ceil(newsData.totalResults / 20)) {
+    if (currentPage < Math.ceil(newsData.totalResults / 20)) {
       fetch(
         `https://newsapi.org/v2/top-headlines?country=us&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${
           currentPage + 1
