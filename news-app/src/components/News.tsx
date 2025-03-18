@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import NewsItem from "./NewsItem";
+import Loader from "./Loader";
 
 interface Article {
   title: string;
@@ -13,40 +14,50 @@ interface NewsApiResponse {
   totalResults: number;
 }
 
-function News() {
+interface props {
+  pageSize: number;
+  category: string;
+}
+
+function News(props: props) {
+  var pageSize = props.pageSize;
+  var category = props.category;
   const [newsData, setNewsData] = useState<NewsApiResponse>({
     articles: [],
     totalResults: 0,
   });
 
   const [currentPage, setPage] = useState(1);
-  const pageSize = 21;
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${currentPage}&pageSize=${pageSize}`
+      `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${currentPage}&pageSize=${pageSize}`
     )
       .then((response) => response.json())
       .then((data: NewsApiResponse) => {
         if (data.articles) {
           setNewsData(data);
+          setLoading(false);
         }
       })
       .catch((error) => console.error("Error fetching news:", error));
   }, []);
 
   const handlePrevClick = () => {
+    setLoading(true);
     if (currentPage > 1) {
       fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${
+        `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${
           currentPage - 1
-        }&pageSize=20`
+        }&pageSize=${pageSize}`
       )
         .then((response) => response.json())
         .then((data: NewsApiResponse) => {
           if (data.articles) {
             setNewsData(data);
             setPage(currentPage - 1);
+            setLoading(false);
           }
         })
         .catch((error) => console.error("Error fetching news:", error));
@@ -54,17 +65,19 @@ function News() {
   };
 
   const handleNextClick = () => {
-    if (currentPage < Math.ceil(newsData.totalResults / 20)) {
+    setLoading(true);
+    if (currentPage < Math.ceil(newsData.totalResults / pageSize)) {
       fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${
+        `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=19218f55849b4da39f5a34e67b85bff9&page=${
           currentPage + 1
-        }&pageSize=20`
+        }&pageSize=${pageSize}`
       )
         .then((response) => response.json())
         .then((data: NewsApiResponse) => {
           if (data.articles) {
             setNewsData(data);
             setPage(currentPage + 1);
+            setLoading(false);
           }
         })
         .catch((error) => console.error("Error fetching news:", error));
@@ -73,9 +86,8 @@ function News() {
 
   return (
     <>
-      <h1 style={{ paddingLeft: "116px", paddingTop: "35px" }}>
-        Breaking News
-      </h1>
+      <h1 style={{ textAlign: "center", paddingTop: "35px" }}>Breaking News</h1>
+      {loading && <Loader />}
       <div className="container pt-4">
         <div className="row">
           {newsData.articles.map((element, index) => (
@@ -111,6 +123,9 @@ function News() {
             <li className="page-item">
               <button
                 className="page-link btn btn-dark"
+                disabled={
+                  currentPage >= Math.ceil(newsData.totalResults / pageSize)
+                }
                 onClick={handleNextClick}
               >
                 Next
